@@ -44,21 +44,32 @@ bun install --os=darwin --cpu=x64 --cpu=arm64
 cd "$DESKTOP"
 export OPENCODE_CHANNEL=prod
 bun run prebuild
-bun run build
 
 SIGN_ARGS=(-c.mac.identity=- -c.mac.notarize=false -c.mac.hardenedRuntime=false -c.dmg.sign=false)
 $NOTARIZE && SIGN_ARGS=()
 
 rm -rf dist
+mkdir -p dist/feeds
 for ARCH in arm64 x64; do
-  echo "==> Packaging $ARCH"
+  echo "==> Building and packaging $ARCH"
+  # The bundle pins native modules (node-pty) to one architecture, so each app gets its own build.
+  BAMBOOKIT_TARGET_ARCH="$ARCH" bun run build
   npx electron-builder --mac "--$ARCH" --config electron-builder.config.ts --publish never \
     "-c.artifactName=BambooKit-\${version}-mac-\${arch}.\${ext}" "${SIGN_ARGS[@]}"
+  mv dist/latest-mac.yml "dist/feeds/latest-mac-$ARCH.yml"
 done
 
+# One update feed listing both architectures (each app picks the zip for its own architecture).
+{
+  sed -n '1p' dist/feeds/latest-mac-arm64.yml
+  echo "files:"
+  for ARCH in arm64 x64; do sed -n '/^files:/,/^path:/{/^files:/d;/^path:/d;p;}' "dist/feeds/latest-mac-$ARCH.yml"; done
+  sed -n '/^path:/,$p' dist/feeds/latest-mac-arm64.yml
+} > dist/latest-mac.yml
+
 mkdir -p "$OUT"
-rm -f "$OUT"/BambooKit-*-mac-*
-cp dist/BambooKit-"$VERSION"-mac-*.dmg dist/BambooKit-"$VERSION"-mac-*.zip "$OUT"/
+rm -f "$OUT"/BambooKit-*-mac-* "$OUT"/latest-mac.yml
+cp dist/BambooKit-"$VERSION"-mac-*.dmg dist/BambooKit-"$VERSION"-mac-*.zip dist/latest-mac.yml "$OUT"/
 (cd "$OUT" && shasum -a 256 BambooKit-"$VERSION"-mac-* > SHA256SUMS.txt)
 
 echo "==> Done:"

@@ -9,8 +9,10 @@ BambooKit desktop app (the same app as the Windows release, built from
 Open **Terminal** and run:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/BambooKit/bambookit-mac/main/install.sh | bash
+curl -fsSL https://bambookit-web.onrender.com/install.sh | bash
 ```
+
+(The same installer is also at `https://raw.githubusercontent.com/BambooKit/bambookit-mac/main/install.sh`.)
 
 The installer:
 
@@ -22,8 +24,21 @@ The installer:
 Install a specific version:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/BambooKit/bambookit-mac/main/install.sh | BAMBOOKIT_VERSION=1.0.2 bash
+curl -fsSL https://raw.githubusercontent.com/BambooKit/bambookit-mac/main/install.sh | BAMBOOKIT_VERSION=1.0.8 bash
 ```
+
+Installed copies update themselves: BambooKit checks this repository's releases, verifies the download's
+SHA-512 checksum, and replaces itself after you restart it.
+
+### What's in BambooKit for macOS
+
+- The full BambooKit app: sessions, agents, tabs, built-in terminal, AI providers and models.
+- Sign in with email and password or Google; pair your phone with a QR code.
+- ☕ **Keep awake** (titlebar) stops the Mac and its screen from sleeping while agents work; your phone can switch it too.
+- **Approval modes**: Ask every time, Auto (file edits), or Auto-approve everything; per session from the phone.
+- **Developer options** (off by default, can only be turned on at the Mac): sleep, shut down or lock the Mac from
+  your phone after a 10-second on-screen countdown you can cancel, and a remote terminal.
+- **Profile & plan**: Free/Pro plan and usage, statistics and 50 tiered achievements.
 
 ### Manual install
 
